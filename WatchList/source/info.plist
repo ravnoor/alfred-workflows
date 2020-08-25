@@ -120,6 +120,8 @@
 				<false/>
 			</dict>
 		</array>
+		<key>C929975A-3B90-474A-BA08-595EAB51A9B2</key>
+		<array/>
 		<key>D75377F6-6B47-4683-B400-224620A75802</key>
 		<array>
 			<dict>
@@ -189,17 +191,27 @@
 				<key>modifiersubtext</key>
 				<string></string>
 				<key>vitoclose</key>
-				<false/>
+				<true/>
 			</dict>
 			<dict>
 				<key>destinationuid</key>
 				<string>98D586EA-8DD5-4EAE-8A4A-3A06AC84E9DC</string>
 				<key>modifiers</key>
-				<integer>1048576</integer>
+				<integer>262144</integer>
 				<key>modifiersubtext</key>
 				<string>Do not mark as watched</string>
 				<key>vitoclose</key>
 				<false/>
+			</dict>
+			<dict>
+				<key>destinationuid</key>
+				<string>C929975A-3B90-474A-BA08-595EAB51A9B2</string>
+				<key>modifiers</key>
+				<integer>1048576</integer>
+				<key>modifiersubtext</key>
+				<string>Mark as watched without playing</string>
+				<key>vitoclose</key>
+				<true/>
 			</dict>
 			<dict>
 				<key>destinationuid</key>
@@ -239,26 +251,6 @@
 		<dict>
 			<key>config</key>
 			<dict>
-				<key>acceptsmulti</key>
-				<true/>
-				<key>filetypes</key>
-				<array>
-					<string>+public.audiovisual-content</string>
-					<string>public.folder</string>
-				</array>
-				<key>name</key>
-				<string>Add to watchlist</string>
-			</dict>
-			<key>type</key>
-			<string>alfred.workflow.trigger.action</string>
-			<key>uid</key>
-			<string>3B8DC012-8D13-4919-8EB0-AC42C883527E</string>
-			<key>version</key>
-			<integer>1</integer>
-		</dict>
-		<dict>
-			<key>config</key>
-			<dict>
 				<key>concurrently</key>
 				<false/>
 				<key>escaping</key>
@@ -269,8 +261,10 @@
 paths = ENV['added_item_order'] == 'append' ? ARGV.sort : ARGV.sort.reverse
 
 paths.each do |path|
+  require_audiovisual(path)
+
   if !ENV['move_on_add'].nil? &amp;&amp; !ENV['move_on_add'].empty?
-    new_path = move_to_dir(path, File.join(ENV['HOME'], ENV['move_on_add']))
+    new_path = move_to_dir(path, File.expand_path(ENV['move_on_add']))
     add_local_to_watchlist(new_path)
   else
     add_local_to_watchlist(path)
@@ -293,6 +287,26 @@ end</string>
 		<dict>
 			<key>config</key>
 			<dict>
+				<key>acceptsmulti</key>
+				<true/>
+				<key>filetypes</key>
+				<array>
+					<string>+public.audiovisual-content</string>
+					<string>public.folder</string>
+				</array>
+				<key>name</key>
+				<string>Add to watchlist</string>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.trigger.action</string>
+			<key>uid</key>
+			<string>3B8DC012-8D13-4919-8EB0-AC42C883527E</string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
 				<key>triggerid</key>
 				<string>add_file_to_watchlist</string>
 			</dict>
@@ -300,27 +314,6 @@ end</string>
 			<string>alfred.workflow.trigger.external</string>
 			<key>uid</key>
 			<string>63FBFF0E-05C5-47D2-9951-CB86E114264B</string>
-			<key>version</key>
-			<integer>1</integer>
-		</dict>
-		<dict>
-			<key>config</key>
-			<dict>
-				<key>argumenttype</key>
-				<integer>2</integer>
-				<key>keyword</key>
-				<string>swl</string>
-				<key>subtext</key>
-				<string>Adds url to play media from stream</string>
-				<key>text</key>
-				<string>Add stream (swl)</string>
-				<key>withspace</key>
-				<false/>
-			</dict>
-			<key>type</key>
-			<string>alfred.workflow.input.keyword</string>
-			<key>uid</key>
-			<string>A22F833D-4556-4FEE-8A77-EE6A6A2FE8FE</string>
 			<key>version</key>
 			<integer>1</integer>
 		</dict>
@@ -352,6 +345,27 @@ add_url_to_watchlist(ARGV[0].strip)</string>
 		<dict>
 			<key>config</key>
 			<dict>
+				<key>argumenttype</key>
+				<integer>2</integer>
+				<key>keyword</key>
+				<string>swl</string>
+				<key>subtext</key>
+				<string>Adds url to play media from stream</string>
+				<key>text</key>
+				<string>Add stream (swl)</string>
+				<key>withspace</key>
+				<false/>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.input.keyword</string>
+			<key>uid</key>
+			<string>A22F833D-4556-4FEE-8A77-EE6A6A2FE8FE</string>
+			<key>version</key>
+			<integer>1</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
 				<key>argument</key>
 				<string>{clipboard}</string>
 				<key>variables</key>
@@ -374,7 +388,6 @@ add_url_to_watchlist(ARGV[0].strip)</string>
 				<key>script</key>
 				<string>require "#{Dir.pwd}/watchlist_functions.rb"
 
-clipboard = %x(pbpaste).strip
 add_url_to_watchlist(ARGV[0].strip, true)</string>
 				<key>scriptargtype</key>
 				<integer>1</integer>
@@ -408,6 +421,31 @@ add_url_to_watchlist(ARGV[0].strip, true)</string>
 		<dict>
 			<key>config</key>
 			<dict>
+				<key>concurrently</key>
+				<false/>
+				<key>escaping</key>
+				<integer>102</integer>
+				<key>script</key>
+				<string>require "#{Dir.pwd}/watchlist_functions.rb"
+
+play(ARGV[0])</string>
+				<key>scriptargtype</key>
+				<integer>1</integer>
+				<key>scriptfile</key>
+				<string></string>
+				<key>type</key>
+				<integer>2</integer>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.script</string>
+			<key>uid</key>
+			<string>AFB3D5CC-1B83-4675-91D8-770B0B2B7576</string>
+			<key>version</key>
+			<integer>2</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
 				<key>triggerid</key>
 				<string>sort_order</string>
 			</dict>
@@ -425,6 +463,8 @@ add_url_to_watchlist(ARGV[0].strip, true)</string>
 				<true/>
 				<key>alfredfiltersresultsmatchmode</key>
 				<integer>0</integer>
+				<key>argumenttreatemptyqueryasnil</key>
+				<false/>
 				<key>argumenttrimmode</key>
 				<integer>0</integer>
 				<key>argumenttype</key>
@@ -465,32 +505,7 @@ display_towatch(ENV['sort_order'])</string>
 			<key>uid</key>
 			<string>E8F9509C-843D-40C8-B5F1-6B8FC692A18C</string>
 			<key>version</key>
-			<integer>2</integer>
-		</dict>
-		<dict>
-			<key>config</key>
-			<dict>
-				<key>concurrently</key>
-				<false/>
-				<key>escaping</key>
-				<integer>102</integer>
-				<key>script</key>
-				<string>require "#{Dir.pwd}/watchlist_functions.rb"
-
-play(ARGV[0])</string>
-				<key>scriptargtype</key>
-				<integer>1</integer>
-				<key>scriptfile</key>
-				<string></string>
-				<key>type</key>
-				<integer>2</integer>
-			</dict>
-			<key>type</key>
-			<string>alfred.workflow.action.script</string>
-			<key>uid</key>
-			<string>AFB3D5CC-1B83-4675-91D8-770B0B2B7576</string>
-			<key>version</key>
-			<integer>2</integer>
+			<integer>3</integer>
 		</dict>
 		<dict>
 			<key>config</key>
@@ -517,13 +532,13 @@ function url_exists {
 }
 
 function notification {
-  readonly local notificator="$(find . -type d -name 'Notificator.app')"
+  local -r notificator="$(find . -type d -name 'Notificator.app')"
   if [[ -n "${notificator}" ]]; then
     "${notificator}/Contents/Resources/Scripts/notificator" --message "${1}" --title "${alfred_workflow_name}" --subtitle 'A new version is available'
     return
   fi
 
-  readonly local terminal_notifier="$(find . -type f -name 'terminal-notifier')"
+  local -r terminal_notifier="$(find . -type f -name 'terminal-notifier')"
   if [[ -n "${terminal_notifier}" ]]; then
     "${terminal_notifier}" -title "${alfred_workflow_name}" -subtitle 'A new version is available' -message "${1}"
     return
@@ -605,6 +620,31 @@ play(ARGV[0], false)</string>
 			<string>alfred.workflow.action.script</string>
 			<key>uid</key>
 			<string>98D586EA-8DD5-4EAE-8A4A-3A06AC84E9DC</string>
+			<key>version</key>
+			<integer>2</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>concurrently</key>
+				<false/>
+				<key>escaping</key>
+				<integer>102</integer>
+				<key>script</key>
+				<string>require "#{Dir.pwd}/watchlist_functions.rb"
+
+mark_watched(ARGV[0])</string>
+				<key>scriptargtype</key>
+				<integer>1</integer>
+				<key>scriptfile</key>
+				<string></string>
+				<key>type</key>
+				<integer>2</integer>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.script</string>
+			<key>uid</key>
+			<string>C929975A-3B90-474A-BA08-595EAB51A9B2</string>
 			<key>version</key>
 			<integer>2</integer>
 		</dict>
@@ -702,27 +742,6 @@ update_series(ARGV[0])</string>
 		<dict>
 			<key>config</key>
 			<dict>
-				<key>argumenttype</key>
-				<integer>2</integer>
-				<key>keyword</key>
-				<string>wle</string>
-				<key>subtext</key>
-				<string>Reorder and rename watchlist items</string>
-				<key>text</key>
-				<string>Edit (wle)</string>
-				<key>withspace</key>
-				<false/>
-			</dict>
-			<key>type</key>
-			<string>alfred.workflow.input.keyword</string>
-			<key>uid</key>
-			<string>68BC0595-725B-4DDD-B33F-01C3DE55A709</string>
-			<key>version</key>
-			<integer>1</integer>
-		</dict>
-		<dict>
-			<key>config</key>
-			<dict>
 				<key>concurrently</key>
 				<false/>
 				<key>escaping</key>
@@ -748,35 +767,33 @@ edit_towatch</string>
 		<dict>
 			<key>config</key>
 			<dict>
-				<key>concurrently</key>
-				<false/>
-				<key>escaping</key>
-				<integer>102</integer>
-				<key>script</key>
-				<string>require "#{Dir.pwd}/watchlist_functions.rb"
-
-mark_unwatched(ARGV[0])</string>
-				<key>scriptargtype</key>
-				<integer>1</integer>
-				<key>scriptfile</key>
-				<string></string>
-				<key>type</key>
+				<key>argumenttype</key>
 				<integer>2</integer>
+				<key>keyword</key>
+				<string>wle</string>
+				<key>subtext</key>
+				<string>Reorder and rename watchlist items</string>
+				<key>text</key>
+				<string>Edit (wle)</string>
+				<key>withspace</key>
+				<false/>
 			</dict>
 			<key>type</key>
-			<string>alfred.workflow.action.script</string>
+			<string>alfred.workflow.input.keyword</string>
 			<key>uid</key>
-			<string>C92FF9E0-CBC7-4421-9B75-4B8C557EB4DD</string>
+			<string>68BC0595-725B-4DDD-B33F-01C3DE55A709</string>
 			<key>version</key>
-			<integer>2</integer>
+			<integer>1</integer>
 		</dict>
 		<dict>
 			<key>config</key>
 			<dict>
 				<key>alfredfiltersresults</key>
-				<false/>
+				<true/>
 				<key>alfredfiltersresultsmatchmode</key>
 				<integer>0</integer>
+				<key>argumenttreatemptyqueryasnil</key>
+				<false/>
 				<key>argumenttrimmode</key>
 				<integer>0</integer>
 				<key>argumenttype</key>
@@ -817,6 +834,31 @@ display_watched</string>
 			<key>uid</key>
 			<string>E75EF64B-CE9C-4789-8FCC-8095D43D1FEA</string>
 			<key>version</key>
+			<integer>3</integer>
+		</dict>
+		<dict>
+			<key>config</key>
+			<dict>
+				<key>concurrently</key>
+				<false/>
+				<key>escaping</key>
+				<integer>102</integer>
+				<key>script</key>
+				<string>require "#{Dir.pwd}/watchlist_functions.rb"
+
+mark_unwatched(ARGV[0])</string>
+				<key>scriptargtype</key>
+				<integer>1</integer>
+				<key>scriptfile</key>
+				<string></string>
+				<key>type</key>
+				<integer>2</integer>
+			</dict>
+			<key>type</key>
+			<string>alfred.workflow.action.script</string>
+			<key>uid</key>
+			<string>C92FF9E0-CBC7-4421-9B75-4B8C557EB4DD</string>
+			<key>version</key>
 			<integer>2</integer>
 		</dict>
 		<dict>
@@ -842,7 +884,7 @@ display_watched</string>
 			<key>config</key>
 			<dict>
 				<key>autopaste</key>
-				<true/>
+				<false/>
 				<key>clipboardtext</key>
 				<string>{query}</string>
 				<key>transient</key>
@@ -853,7 +895,7 @@ display_watched</string>
 			<key>uid</key>
 			<string>824AADC5-ECD6-4B9A-B01B-901EE6EC2552</string>
 			<key>version</key>
-			<integer>2</integer>
+			<integer>3</integer>
 		</dict>
 	</array>
 	<key>readme</key>
@@ -861,7 +903,7 @@ display_watched</string>
  
 We often have series of videos and streams that we’d like to watch but not necessarily keep after, but tracking which we’ve already seen (and are thus safe to delete) can be a chore.
  
-Select in the Finder the files or directories you wish to add to your list and apply the file action `Add to watchlist`. If the `move_on_add` Workflow Environment Variable is set, the items will be moved to that directory (relative to your home). Items will be prepended or appended to the list, depending on the `add_item_order` Workflow Environment Variable. Alternatively, call `swl` to add the URL in your clipboard as a stream (add ⌘ for the full playlist).
+Select in the Finder the files or directories you wish to add to your list and apply the file action `Add to watchlist`. If the `move_on_add` Workflow Environment Variable is set, the items will be moved to that directory. Items will be prepended or appended to the list, depending on the `add_item_order` Workflow Environment Variable. Alternatively, call `swl` to add the URL in your clipboard as a stream (add ⌘ for the full playlist).
 
 You then have some options you can pick from, all starting with `wl`.
 
@@ -875,7 +917,7 @@ You then have some options you can pick from, all starting with `wl`.
 
 ![](https://i.imgur.com/SymAbSa.png)
 
-In both cases, ↵ plays the selection. Add ⌘ to play without marking as watched or ⌥ to rescan a directory (useful if you made manual changes to it).
+In both cases, ↵ plays the selection. Add ⌃ to play without marking as watched or ⌥ to rescan a directory (useful if you made manual changes to it). ⌘↵ will mark as watched without playing. ⇧ or ⌘Y shows a quicklook preview on files and streams.
 
 If the `top_on_play` Workflow Environment Variable is set to `true`, the item will be moved to the top of the list before starting playback.
 
@@ -883,13 +925,13 @@ Items starting with `≈` are streams. They show no file size (since they aren�
 
 An item will not be marked as watched if we can access the player’s CLI and it exits with a failure exit code.
 
-`wlu` shows the list of watched items. The limit of recent items in this list is controlled by the `maximum_watched` Workflow Environment Variable. Action an item to mark it as unwatched. Note that in the case of files it does not recover them from the trash, as there is no reliable way to do so on macOS — that step you need to do yourself. If the item has a URL origin (you’ll see it in the subtitle) add ⌘ to open the URL in your default browser or ⌥ to copy it to the clipboard.
+`wlu` shows the list of watched items. The limit of recent items in this list is controlled by the `maximum_watched` Workflow Environment Variable. Action an item to mark it as unwatched. Note that in the case of files it does not recover them from the trash, as there is no reliable way to do so on macOS — that step you need to do yourself. If the item has a URL origin (you’ll see it in the subtitle) add ⌘ to open the URL in your default browser or ⌥ to copy it to the clipboard. If the item has an origin URL, ⇧ or ⌘Y shows a quicklook preview.
 
 ![](https://i.imgur.com/XK0W6Wj.png)
 
 `wle` allows you to reorder, rename, and remove items from the list.
 
-If you want to keep your lists synced between machines, use the `lists_dir` Workflow Environment Variable to pick a custom save location relative to your home directory.
+To keep your lists synced between machines, use the `lists_dir` Workflow Environment Variable to pick a custom save location.
 
 Finally, if you use [DownVid](https://github.com/vitorgalvao/alfred-workflows/tree/master/DownVid) it has an option to add the downloaded video files directly to your watchlist.
 
@@ -963,7 +1005,7 @@ There are three types of items: `files`, `series`, and `streams`. `stream`s can 
 			<key>xpos</key>
 			<integer>250</integer>
 			<key>ypos</key>
-			<integer>980</integer>
+			<integer>1100</integer>
 		</dict>
 		<key>6DBE8BF2-3AA2-46A3-A028-739C1E71A985</key>
 		<dict>
@@ -977,14 +1019,14 @@ There are three types of items: `files`, `series`, and `streams`. `stream`s can 
 			<key>xpos</key>
 			<integer>520</integer>
 			<key>ypos</key>
-			<integer>980</integer>
+			<integer>1100</integer>
 		</dict>
 		<key>824AADC5-ECD6-4B9A-B01B-901EE6EC2552</key>
 		<dict>
 			<key>xpos</key>
 			<integer>520</integer>
 			<key>ypos</key>
-			<integer>1340</integer>
+			<integer>1460</integer>
 		</dict>
 		<key>84C51977-8426-491F-A9D4-A6DF7E8F0C8C</key>
 		<dict>
@@ -1009,7 +1051,7 @@ There are three types of items: `files`, `series`, and `streams`. `stream`s can 
 			<key>xpos</key>
 			<integer>520</integer>
 			<key>ypos</key>
-			<integer>860</integer>
+			<integer>980</integer>
 		</dict>
 		<key>98D586EA-8DD5-4EAE-8A4A-3A06AC84E9DC</key>
 		<dict>
@@ -1032,33 +1074,40 @@ There are three types of items: `files`, `series`, and `streams`. `stream`s can 
 			<key>ypos</key>
 			<integer>500</integer>
 		</dict>
-		<key>C92FF9E0-CBC7-4421-9B75-4B8C557EB4DD</key>
-		<dict>
-			<key>xpos</key>
-			<integer>520</integer>
-			<key>ypos</key>
-			<integer>1100</integer>
-		</dict>
-		<key>D27FE458-78D9-4C16-BF89-7E489D839F6D</key>
+		<key>C929975A-3B90-474A-BA08-595EAB51A9B2</key>
 		<dict>
 			<key>xpos</key>
 			<integer>520</integer>
 			<key>ypos</key>
 			<integer>740</integer>
 		</dict>
+		<key>C92FF9E0-CBC7-4421-9B75-4B8C557EB4DD</key>
+		<dict>
+			<key>xpos</key>
+			<integer>520</integer>
+			<key>ypos</key>
+			<integer>1220</integer>
+		</dict>
+		<key>D27FE458-78D9-4C16-BF89-7E489D839F6D</key>
+		<dict>
+			<key>xpos</key>
+			<integer>520</integer>
+			<key>ypos</key>
+			<integer>860</integer>
+		</dict>
 		<key>D75377F6-6B47-4683-B400-224620A75802</key>
 		<dict>
 			<key>xpos</key>
 			<integer>430</integer>
 			<key>ypos</key>
-			<integer>890</integer>
+			<integer>1010</integer>
 		</dict>
 		<key>DA8908F6-F112-4087-86D4-1B9671DD766C</key>
 		<dict>
 			<key>xpos</key>
 			<integer>520</integer>
 			<key>ypos</key>
-			<integer>1220</integer>
+			<integer>1340</integer>
 		</dict>
 		<key>E4752307-AF7E-4E47-80F9-1BB75C5CCFCB</key>
 		<dict>
@@ -1072,7 +1121,7 @@ There are three types of items: `files`, `series`, and `streams`. `stream`s can 
 			<key>xpos</key>
 			<integer>250</integer>
 			<key>ypos</key>
-			<integer>1100</integer>
+			<integer>1220</integer>
 		</dict>
 		<key>E8F9509C-843D-40C8-B5F1-6B8FC692A18C</key>
 		<dict>
@@ -1086,7 +1135,7 @@ There are three types of items: `files`, `series`, and `streams`. `stream`s can 
 			<key>xpos</key>
 			<integer>250</integer>
 			<key>ypos</key>
-			<integer>860</integer>
+			<integer>980</integer>
 		</dict>
 	</dict>
 	<key>variables</key>
@@ -1094,11 +1143,11 @@ There are three types of items: `files`, `series`, and `streams`. `stream`s can 
 		<key>added_item_order</key>
 		<string>append</string>
 		<key>lists_dir</key>
-		<string>Dropbox/Libraries/AlfredWorkflowsData/WatchList</string>
+		<string>~/Dropbox/Libraries/AlfredWorkflowsData/WatchList</string>
 		<key>maximum_watched</key>
 		<string>9</string>
 		<key>move_on_add</key>
-		<string>Movies</string>
+		<string>~/Movies</string>
 		<key>top_on_play</key>
 		<string>true</string>
 	</dict>
@@ -1109,7 +1158,7 @@ There are three types of items: `files`, `series`, and `streams`. `stream`s can 
 		<string>added_item_order</string>
 	</array>
 	<key>version</key>
-	<string>1.19.5</string>
+	<string>20.9</string>
 	<key>webaddress</key>
 	<string>https://vitorgalvao.com/</string>
 </dict>

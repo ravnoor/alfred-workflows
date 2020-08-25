@@ -1,9 +1,3 @@
-To support my continued open-source work, pick a method:
-
-[<img src='https://upload.wikimedia.org/wikipedia/commons/5/53/PayPal_2014_logo.svg' height='18' alt='Support via Paypal'>](https://www.paypal.me/vitorgalvao)&nbsp;&nbsp;
-[<img src='https://upload.wikimedia.org/wikipedia/commons/c/c5/Bitcoin_logo.svg' height='15' alt='Support via Bitcoin'>](http://vitorgalvao.com/bitcoin_tip_jar.html)&nbsp;&nbsp;
-[<img src='https://dl.dropboxusercontent.com/s/y3pft1fbmer5v22/society6.svg' height='19' alt='Support via Society6'>](https://vitorgalvao.com/society6)
-
 # Collection of Alfred Workflows
 ### AlfredBookmarklet <img src='https://raw.githubusercontent.com/vitorgalvao/alfred-workflows/master/AlfredBookmarklet/source/icon.png' width='60' align='center' alt='AlfredBookmarklet icon'>
 Use a browser bookmarklet via Alfred
@@ -19,11 +13,6 @@ Tools to help moderate the Alfred forums
 Pauses and resumes execution of the frontmost app
 
 [info](https://github.com/vitorgalvao/alfred-workflows/tree/master/AppFreeze) | [download](https://raw.githubusercontent.com/vitorgalvao/alfred-workflows/master/AppFreeze/AppFreeze.alfredworkflow)
-
-### AppVersion <img src='https://raw.githubusercontent.com/vitorgalvao/alfred-workflows/master/AppVersion/source/icon.png' width='60' align='center' alt='AppVersion icon'>
-Show version number of installed apps
-
-[info](https://github.com/vitorgalvao/alfred-workflows/tree/master/AppVersion) | [download](https://raw.githubusercontent.com/vitorgalvao/alfred-workflows/master/AppVersion/AppVersion.alfredworkflow)
 
 ### BugNot <img src='https://raw.githubusercontent.com/vitorgalvao/alfred-workflows/master/BugNot/source/icon.png' width='60' align='center' alt='BugNot icon'>
 Get logins from bugmenot
@@ -56,14 +45,14 @@ Find settings and preferences to delete
 [info](https://github.com/vitorgalvao/alfred-workflows/tree/master/DeleteConfig) | [download](https://raw.githubusercontent.com/vitorgalvao/alfred-workflows/master/DeleteConfig/DeleteConfig.alfredworkflow)
 
 ### DenteAzul <img src='https://raw.githubusercontent.com/vitorgalvao/alfred-workflows/master/DenteAzul/source/icon.png' width='60' align='center' alt='DenteAzul icon'>
-Toggle bluetooth and its menu bar icon
+Toggle bluetooth and paired device connectivity
 
 [info](https://github.com/vitorgalvao/alfred-workflows/tree/master/DenteAzul) | [download](https://raw.githubusercontent.com/vitorgalvao/alfred-workflows/master/DenteAzul/DenteAzul.alfredworkflow)
 
-### DownVid <img src='https://raw.githubusercontent.com/vitorgalvao/alfred-workflows/master/DownVid/source/icon.png' width='60' align='center' alt='DownVid icon'>
-Download videos from popular sources
+### DownMedia <img src='https://raw.githubusercontent.com/vitorgalvao/alfred-workflows/master/DownMedia/source/icon.png' width='60' align='center' alt='DownMedia icon'>
+Download media from popular sources
 
-[info](https://github.com/vitorgalvao/alfred-workflows/tree/master/DownVid) | [download](https://raw.githubusercontent.com/vitorgalvao/alfred-workflows/master/DownVid/DownVid.alfredworkflow)
+[info](https://github.com/vitorgalvao/alfred-workflows/tree/master/DownMedia) | [download](https://raw.githubusercontent.com/vitorgalvao/alfred-workflows/master/DownMedia/DownMedia.alfredworkflow)
 
 ### FormatSize <img src='https://raw.githubusercontent.com/vitorgalvao/alfred-workflows/master/FormatSize/source/icon.png' width='60' align='center' alt='FormatSize icon'>
 Reference paper sizes and device resolutions
@@ -115,6 +104,11 @@ Creates a new file in the current Finder directory
 
 [info](https://github.com/vitorgalvao/alfred-workflows/tree/master/NewFile) | [download](https://raw.githubusercontent.com/vitorgalvao/alfred-workflows/master/NewFile/NewFile.alfredworkflow)
 
+### NoteTaker <img src='https://raw.githubusercontent.com/vitorgalvao/alfred-workflows/master/NoteTaker/source/icon.png' width='60' align='center' alt='NoteTaker icon'>
+Creates a new file in the current Finder directory
+
+[info](https://github.com/vitorgalvao/alfred-workflows/tree/master/NoteTaker) | [download](https://raw.githubusercontent.com/vitorgalvao/alfred-workflows/master/NoteTaker/NoteTaker.alfredworkflow)
+
 ### OneUpdater <img src='https://raw.githubusercontent.com/vitorgalvao/alfred-workflows/master/OneUpdater/source/icon.png' width='60' align='center' alt='OneUpdater icon'>
 Update workflows with a single node
 
@@ -124,6 +118,11 @@ Update workflows with a single node
 Granular control over opening apps
 
 [info](https://github.com/vitorgalvao/alfred-workflows/tree/master/OpenActions) | [download](https://raw.githubusercontent.com/vitorgalvao/alfred-workflows/master/OpenActions/OpenActions.alfredworkflow)
+
+### PlayAddress <img src='https://raw.githubusercontent.com/vitorgalvao/alfred-workflows/master/PlayAddress/source/icon.png' width='60' align='center' alt='PlayAddress icon'>
+Play the URL in the frontmost browser or clipboard
+
+[info](https://github.com/vitorgalvao/alfred-workflows/tree/master/PlayAddress) | [download](https://raw.githubusercontent.com/vitorgalvao/alfred-workflows/master/PlayAddress/PlayAddress.alfredworkflow)
 
 ### PingPong <img src='https://raw.githubusercontent.com/vitorgalvao/alfred-workflows/master/PingPong/source/icon.png' width='60' align='center' alt='PingPong icon'>
 Play a round of table tennis with Alfred
@@ -144,6 +143,11 @@ Open image GPS coordinates in a map
 Deal with misbehaving processes
 
 [info](https://github.com/vitorgalvao/alfred-workflows/tree/master/ProcessControl) | [download](https://raw.githubusercontent.com/vitorgalvao/alfred-workflows/master/ProcessControl/ProcessControl.alfredworkflow)
+
+### QuitArena <img src='https://raw.githubusercontent.com/vitorgalvao/alfred-workflows/master/QuitArena/source/icon.png' width='60' align='center' alt='QuitArena icon'>
+Quit all apps, with exceptions
+
+[info](https://github.com/vitorgalvao/alfred-workflows/tree/master/QuitArena) | [download](https://raw.githubusercontent.com/vitorgalvao/alfred-workflows/master/QuitArena/QuitArena.alfredworkflow)
 
 ### RecentDownloads <img src='https://raw.githubusercontent.com/vitorgalvao/alfred-workflows/master/RecentDownloads/source/icon.png' width='60' align='center' alt='RecentDownloads icon'>
 List and act on the contents of a directory
@@ -185,6 +189,11 @@ Run pomodoros and other timers
 
 [info](https://github.com/vitorgalvao/alfred-workflows/tree/master/SandwichTimer) | [download](https://raw.githubusercontent.com/vitorgalvao/alfred-workflows/master/SandwichTimer/SandwichTimer.alfredworkflow)
 
+### SequentialPaste <img src='https://raw.githubusercontent.com/vitorgalvao/alfred-workflows/master/SequentialPaste/source/icon.png' width='60' align='center' alt='SequentialPaste icon'>
+Paste previous clipboard entries in order
+
+[info](https://github.com/vitorgalvao/alfred-workflows/tree/master/SequentialPaste) | [download](https://raw.githubusercontent.com/vitorgalvao/alfred-workflows/master/SequentialPaste/SequentialPaste.alfredworkflow)
+
 ### ShortFilms <img src='https://raw.githubusercontent.com/vitorgalvao/alfred-workflows/master/ShortFilms/source/icon.png' width='60' align='center' alt='ShortFilms icon'>
 Stream from a selection of short films
 
@@ -219,6 +228,11 @@ Save and reuse files, directory structures, and urls
 Get a temporary email inbox
 
 [info](https://github.com/vitorgalvao/alfred-workflows/tree/master/TemporaryEmail) | [download](https://raw.githubusercontent.com/vitorgalvao/alfred-workflows/master/TemporaryEmail/TemporaryEmail.alfredworkflow)
+
+### TrialSounds <img src='https://raw.githubusercontent.com/vitorgalvao/alfred-workflows/master/TrialSounds/source/icon.png' width='60' align='center' alt='TrialSounds icon'>
+Listen to /System/Library/Sounds
+
+[info](https://github.com/vitorgalvao/alfred-workflows/tree/master/TrialSounds) | [download](https://raw.githubusercontent.com/vitorgalvao/alfred-workflows/master/TrialSounds/TrialSounds.alfredworkflow)
 
 ### TurnShoot <img src='https://raw.githubusercontent.com/vitorgalvao/alfred-workflows/master/TurnShoot/source/icon.png' width='60' align='center' alt='TurnShoot icon'>
 A two-player game for Alfred
@@ -265,6 +279,7 @@ These are small helpers to help build Workflows or enhance existing ones. They a
 
 These are the Workflows that are no longer under development and won’t get more updates. Reasons for deprecation depend on the the Workflow, but they don’t tend to be deprecated without an alternative.
 
++ [AppVersion](https://github.com/vitorgalvao/alfred-workflows/tree/fefde12914ed35d1cc7e0e90c62a932cdec3b39a/AppVersion)
 + [RepeatRepeat](https://github.com/vitorgalvao/alfred-workflows/tree/9a70302fa31d6fba2b532bc9dd7eac75d67f6964/RepeatRepeat)
 + [RottentMovies](https://github.com/vitorgalvao/alfred-workflows/tree/2c0eca9f2336e3470b103586189ba7dd450f2b39/RottenMovies)
 

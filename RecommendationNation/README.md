@@ -8,7 +8,7 @@ All commands are accessed via the keyword `rec`.
 
 ![](https://i.imgur.com/Ul4Zv0m.gif)
 
-`View recommendations` shows you everything you’ve saved. ↵ on an item searches for it on a relevant website. For example, by default film recommendations will open on [IMDB](https://www.imdb.com/), while book recommendations will open on [Goodreads](https://www.goodreads.com/).
+`View recommendations` shows everything you’ve saved. ↵ on an item searches for it on a relevant website. For example, by default film recommendations open on [IMDB](https://www.imdb.com/), while book recommendations will open on [Goodreads](https://www.goodreads.com/).
 
 ![](https://i.imgur.com/jf7Q4rY.png)
 
@@ -22,4 +22,4 @@ Several other options are available. ⌘↵ opens on a relevant site and deletes
 
 Your picks will modify the Workflow itself and be accessible via Workflow Environment Variables, meaning you’re not limited to the included choices. If there’s a website you believe I should add, do let me know.
 
-If you want to keep your list synced between machines, use the `recs_file` Workflow Environment Variable to pick a custom save location relative to your home directory.
+To keep your list synced between machines, use the `recs_dir` Workflow Environment Variable to pick a custom save location.

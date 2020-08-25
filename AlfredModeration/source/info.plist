@@ -328,7 +328,7 @@
 				<key>fixedorder</key>
 				<false/>
 				<key>items</key>
-				<string>[{"title":"Using the debugger","arg":"Open the [debugger](http:\/\/support.alfredapp.com\/workflows:debugger), set the log output to “All Information”, and post the output.","subtitle":"How to get debugger output"},{"title":"Upload Workflow","arg":"When asking for help with a Workflow, please upload it somewhere as we can’t properly help you without access to it. Debugging can already be hard with access to the code, and you’re asking us to guess yours from a description. There are multiple places where your code or Workflow setup may be going wrong. Without looking at it we’re shooting in the dark.\n\n\nRead the [url=https:\/\/www.alfredforum.com\/topic\/10224-reporting-problems-with-workflows\/]Reporting Problems with Workflows[\/url] topic, as it gives a nice overview on how to build an effective report.","subtitle":"Upload your Workflow so we can help"},{"title":"Reporting bugs","arg":"When making a request or a bug report pertaining to a specific workflow, please [b]do not open a new thread to discuss your issue[\/b].\n\n\nMaking a new thread, while it seems like it’ll give your problem visibility, will only fragment the discussion and make it less likely the author and users of the workflow (the people that can actually help) will see it.\n\n\nPlease read the [url=https:\/\/www.alfredforum.com\/topic\/10224-reporting-problems-with-workflows\/]Reporting Problems with Workflows[\/url] topic, as it gives a nice overview on how to make a report with a better chance of being addressed.","subtitle":"Don’t open a new thread to report Workflow bugs"},{"title":"Not Alfred related","arg":"This problem isn’t Alfred-related. It should be asked about somewhere else more general. Try [url=https:\/\/apple.stackexchange.com\/]Ask Different[\/url].","subtitle":"Suggest the problem be asked about on Ask Different"}]</string>
+				<string>[{"title":"Request debugger output","arg":"Open the [debugger](http:\/\/support.alfredapp.com\/workflows:debugger), set the log output to “All Information”, perfom the failing action, and post the output.","subtitle":""},{"title":"Request uploaded Workflow","arg":"When asking for help with a Workflow, please upload it somewhere ([url=https:\/\/alpha.transfer.sh\/]transfer.sh[\/url] is a fast solution without ads; drop your Workflow in the box in the middle) as we can’t properly help you without access to it. Debugging can already be hard with access to the code, and you’re asking us to guess yours from a description. There are multiple places where your code or Workflow setup may be going wrong. Without looking at it we’re shooting in the dark.\n\n\nRead the [url=https:\/\/www.alfredforum.com\/topic\/10224-reporting-problems-with-workflows\/]Reporting Problems with Workflows[\/url] topic, as it gives a nice overview on how to build an effective report.","subtitle":""},{"title":"Request specific version","arg":"Tip when debugging: never say “latest” but always the exact version. With “latest” we don’t know if you mean the latest beta or stable version, nor do we know if you’re really on the newest version. You may think you’re up to date but be mistaken, or might be a version behind because the auto-update hasn’t kicked yet, or we may be on what we think is the latest version but isn’t, or a multitude of other reasons. “Latest” also makes it difficult for people who face the same issue later on and find the conversation, as they’ll have no idea if their version matches the one in the report."},{"title":"For new thread of an existing Workflow","arg":"When making a request or a bug report pertaining to a specific workflow, please [b]do not open a new thread to discuss your issue[\/b].\n\n\nMaking a new thread, while it seems like it’ll give your problem visibility, fragments the discussion and makes it less likely the author and users of the workflow (the people who can help) will see it.\n\n\nPlease read the [url=https:\/\/www.alfredforum.com\/topic\/10224-reporting-problems-with-workflows\/]Reporting Problems with Workflows[\/url] topic, as it gives a nice overview on how to make a report with a better chance of being addressed.","subtitle":""},{"title":"For thread of Alfred-unrealted problem","arg":"This problem isn’t Alfred-related. It should be asked about somewhere else more general. Try [url=https:\/\/apple.stackexchange.com\/]Ask Different[\/url].","subtitle":""},{"title":"How to ignore paths","arg":"To exclude a path from Alfred search results, either add it under System Preferences → Spotlight → Privacy or add an [background=#eee][font=courier,monospace]alfred:ignore[\/font][\/background] Spotlight comment to it. Note that doing so on a directory will exclude it, but not its contents."}]</string>
 				<key>runningsubtext</key>
 				<string></string>
 				<key>subtext</key>
@@ -389,7 +389,7 @@
 			<key>uid</key>
 			<string>D4FB16AE-3D79-4F93-8F9E-864F063A4A94</string>
 			<key>version</key>
-			<integer>2</integer>
+			<integer>3</integer>
 		</dict>
 		<dict>
 			<key>config</key>
@@ -416,13 +416,13 @@ function url_exists {
 }
 
 function notification {
-  readonly local notificator="$(find . -type d -name 'Notificator.app')"
+  local -r notificator="$(find . -type d -name 'Notificator.app')"
   if [[ -n "${notificator}" ]]; then
     "${notificator}/Contents/Resources/Scripts/notificator" --message "${1}" --title "${alfred_workflow_name}" --subtitle 'A new version is available'
     return
   fi
 
-  readonly local terminal_notifier="$(find . -type f -name 'terminal-notifier')"
+  local -r terminal_notifier="$(find . -type f -name 'terminal-notifier')"
   if [[ -n "${terminal_notifier}" ]]; then
     "${terminal_notifier}" -title "${alfred_workflow_name}" -subtitle 'A new version is available' -message "${1}"
     return
@@ -487,6 +487,8 @@ fi</string>
 			<dict>
 				<key>argument</key>
 				<string></string>
+				<key>passthroughargument</key>
+				<false/>
 				<key>variables</key>
 				<dict/>
 			</dict>
@@ -523,6 +525,8 @@ fi</string>
 				<true/>
 				<key>alfredfiltersresultsmatchmode</key>
 				<integer>0</integer>
+				<key>argumenttreatemptyqueryasnil</key>
+				<false/>
 				<key>argumenttrimmode</key>
 				<integer>0</integer>
 				<key>argumenttype</key>
@@ -544,7 +548,7 @@ fi</string>
 require 'shellwords'
 
 troubleshooting_file = ENV['alfred_workflow_cache'] + '/troubleshooting.json'
-system(__dir__.shellescape + '/help_jsons_update') unless File.exist?(troubleshooting_file)
+system(Dir.pwd.shellescape + '/help_jsons_update') unless File.exist?(troubleshooting_file)
 
 puts File.read(troubleshooting_file)</string>
 				<key>scriptargtype</key>
@@ -565,7 +569,7 @@ puts File.read(troubleshooting_file)</string>
 			<key>uid</key>
 			<string>30757622-3110-4C5D-B2EE-93FDE24319B7</string>
 			<key>version</key>
-			<integer>2</integer>
+			<integer>3</integer>
 		</dict>
 		<dict>
 			<key>config</key>
@@ -591,6 +595,8 @@ puts File.read(troubleshooting_file)</string>
 			<dict>
 				<key>argument</key>
 				<string></string>
+				<key>passthroughargument</key>
+				<false/>
 				<key>variables</key>
 				<dict/>
 			</dict>
@@ -627,6 +633,10 @@ puts File.read(troubleshooting_file)</string>
 				<integer>1</integer>
 				<key>matchstring</key>
 				<string>.*,</string>
+				<key>regexcaseinsensitive</key>
+				<false/>
+				<key>regexmultiline</key>
+				<false/>
 				<key>replacestring</key>
 				<string></string>
 			</dict>
@@ -635,7 +645,7 @@ puts File.read(troubleshooting_file)</string>
 			<key>uid</key>
 			<string>27BCDB31-C251-4748-B175-28E6DF936F82</string>
 			<key>version</key>
-			<integer>1</integer>
+			<integer>2</integer>
 		</dict>
 		<dict>
 			<key>config</key>
@@ -644,6 +654,8 @@ puts File.read(troubleshooting_file)</string>
 				<false/>
 				<key>alfredfiltersresultsmatchmode</key>
 				<integer>0</integer>
+				<key>argumenttreatemptyqueryasnil</key>
+				<false/>
 				<key>argumenttrimmode</key>
 				<integer>0</integer>
 				<key>argumenttype</key>
@@ -680,7 +692,7 @@ puts File.read(troubleshooting_file)</string>
 			<key>uid</key>
 			<string>D95A3F83-E31C-48B7-B2F3-8768B0DB7CB5</string>
 			<key>version</key>
-			<integer>2</integer>
+			<integer>3</integer>
 		</dict>
 		<dict>
 			<key>config</key>
@@ -689,6 +701,10 @@ puts File.read(troubleshooting_file)</string>
 				<integer>1</integer>
 				<key>matchstring</key>
 				<string>.*,</string>
+				<key>regexcaseinsensitive</key>
+				<false/>
+				<key>regexmultiline</key>
+				<false/>
 				<key>replacestring</key>
 				<string></string>
 			</dict>
@@ -697,7 +713,7 @@ puts File.read(troubleshooting_file)</string>
 			<key>uid</key>
 			<string>96E3F57B-84FC-47A2-854C-1CA6BE2DEFFB</string>
 			<key>version</key>
-			<integer>1</integer>
+			<integer>2</integer>
 		</dict>
 		<dict>
 			<key>config</key>
@@ -723,6 +739,8 @@ puts File.read(troubleshooting_file)</string>
 			<dict>
 				<key>argument</key>
 				<string></string>
+				<key>passthroughargument</key>
+				<false/>
 				<key>variables</key>
 				<dict/>
 			</dict>
@@ -740,6 +758,10 @@ puts File.read(troubleshooting_file)</string>
 				<integer>1</integer>
 				<key>matchstring</key>
 				<string>(.*),(.*)</string>
+				<key>regexcaseinsensitive</key>
+				<false/>
+				<key>regexmultiline</key>
+				<false/>
 				<key>replacestring</key>
 				<string>[url=$2]$1[/url]</string>
 			</dict>
@@ -748,7 +770,7 @@ puts File.read(troubleshooting_file)</string>
 			<key>uid</key>
 			<string>F3CF4890-31EA-4464-88FC-9CF740CF7D12</string>
 			<key>version</key>
-			<integer>1</integer>
+			<integer>2</integer>
 		</dict>
 		<dict>
 			<key>config</key>
@@ -757,6 +779,10 @@ puts File.read(troubleshooting_file)</string>
 				<integer>1</integer>
 				<key>matchstring</key>
 				<string>(.*),(.*)</string>
+				<key>regexcaseinsensitive</key>
+				<false/>
+				<key>regexmultiline</key>
+				<false/>
 				<key>replacestring</key>
 				<string>[$1]($2)</string>
 			</dict>
@@ -765,7 +791,7 @@ puts File.read(troubleshooting_file)</string>
 			<key>uid</key>
 			<string>3B1E29D7-F71A-4220-BDC4-2F1B23B40C57</string>
 			<key>version</key>
-			<integer>1</integer>
+			<integer>2</integer>
 		</dict>
 		<dict>
 			<key>config</key>
@@ -817,7 +843,7 @@ puts File.read(troubleshooting_file)</string>
 
 Call `mod` to show a list of help categories. Each one will have items related to a particular subject, such as linking to specific documentation pages or posting common help snippets.
 
-![](https://i.imgur.com/9Ex84ly.png)
+![](https://i.imgur.com/Yh68HJd.png)
 
 `:alfredmoderationforceupdate` will force an update on the categories that rely on parsing the official documentation.</string>
 	<key>uidata</key>
@@ -961,7 +987,7 @@ Call `mod` to show a list of help categories. Each one will have items related t
 		</dict>
 	</dict>
 	<key>version</key>
-	<string>1.1.6</string>
+	<string>20.5</string>
 	<key>webaddress</key>
 	<string>https://vitorgalvao.com/</string>
 </dict>

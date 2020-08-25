@@ -3,7 +3,7 @@
 require 'fileutils'
 require 'net/http'
 
-Templates_dir = ENV['custom_templates_dir'].empty? ? ENV['alfred_workflow_data'] : ENV['HOME'] + '/' + ENV['custom_templates_dir']
+Templates_dir = ENV['custom_templates_dir'].nil? || ENV['custom_templates_dir'].empty? ? ENV['alfred_workflow_data'] : File.expand_path(ENV['custom_templates_dir'])
 Local_templates = Templates_dir + '/local/'
 Remote_templates = Templates_dir + '/remote'
 FileUtils.mkdir_p(Local_templates) unless Dir.exist?(Local_templates)
@@ -15,17 +15,17 @@ def finder_dir
     frontmost_app = Application(frontmost_app_name)
 
     if (Object.is(frontmost_app_name, "Finder")) {
-      unescape(frontmost_app.finderWindows[0].target.url()).slice(7).slice(0, -1)
+      decodeURI(frontmost_app.finderWindows[0].target.url()).slice(7).slice(0, -1)
     } else if (Object.is(frontmost_app_name, "Path Finder")) {
       frontmost_app.finderWindows[0].target.posixPath()
     } else {
-      unescape(Application("Finder").home.url()).slice(7).slice(0, -1)
+      decodeURI(Application("Finder").home.url()).slice(7).slice(0, -1)
     }
   '}.sub(/\n$/, '/')
 end
 
 def notification(message)
-  system("#{__dir__}/Notificator.app/Contents/Resources/Scripts/notificator", '--message', message, '--title', ENV['alfred_workflow_name'])
+  system("#{Dir.pwd}/Notificator.app/Contents/Resources/Scripts/notificator", '--message', message, '--title', ENV['alfred_workflow_name'])
 end
 
 def local_list
@@ -132,7 +132,7 @@ def local_script_run(location)
 
   require 'shellwords'
   Dir.chdir(location)
-  system("#{__dir__}/#{tm_script}".shellescape)
+  system("#{Dir.pwd}/#{tm_script}".shellescape)
 end
 
 # Copy files and directories directly

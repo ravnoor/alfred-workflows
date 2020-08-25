@@ -82,8 +82,15 @@
 				<key>escaping</key>
 				<integer>102</integer>
 				<key>script</key>
-				<string>qr_image="$(mktemp).png"
-encoded_text="$(perl -MURI::Escape -wlne 'print uri_escape ($_)' &lt;&lt;&lt; "${1}" | perl -pe 's/\n/%0A/')"
+				<string>readonly qr_image="$(
+  if [[ "${save_to_desktop}" == 'true' ]]; then
+    echo "${HOME}/Desktop/$(date '+%Y%m%d-%H%M%S').png"
+  else
+    echo "$(mktemp).png"
+  fi
+)"
+
+readonly encoded_text="$(perl -MURI::Escape -wlne 'print uri_escape ($_)' &lt;&lt;&lt; "${1}" | perl -pe 's/\n/%0A/')"
  
 curl --location --silent --output "${qr_image}" "http://chart.apis.google.com/chart?cht=qr&amp;chs=400x400&amp;chl=${encoded_text}&amp;chld=H|0"
 
@@ -127,13 +134,13 @@ function url_exists {
 }
 
 function notification {
-  readonly local notificator="$(find . -type d -name 'Notificator.app')"
+  local -r notificator="$(find . -type d -name 'Notificator.app')"
   if [[ -n "${notificator}" ]]; then
     "${notificator}/Contents/Resources/Scripts/notificator" --message "${1}" --title "${alfred_workflow_name}" --subtitle 'A new version is available'
     return
   fi
 
-  readonly local terminal_notifier="$(find . -type f -name 'terminal-notifier')"
+  local -r terminal_notifier="$(find . -type f -name 'terminal-notifier')"
   if [[ -n "${terminal_notifier}" ]]; then
     "${terminal_notifier}" -title "${alfred_workflow_name}" -subtitle 'A new version is available' -message "${1}"
     return
@@ -195,7 +202,9 @@ fi</string>
 		</dict>
 	</array>
 	<key>readme</key>
-	<string>Select some text, press the keyboard shortcut, and it’ll convert it to a QR Code that’ll be opened with QuickLook.</string>
+	<string>Select some text, press the keyboard shortcut, and it’ll convert it to a QR Code that’ll be opened with QuickLook.
+
+Images are saved to a temporary location auto-cleaned by the system. To keep images for reuse, set the `save_to_desktop` Workflow Environment Variable to `true`.</string>
 	<key>uidata</key>
 	<dict>
 		<key>8CB9A286-0D57-4AF9-8AD3-AFB73F8E2693</key>
@@ -224,8 +233,13 @@ fi</string>
 			<integer>20</integer>
 		</dict>
 	</dict>
+	<key>variables</key>
+	<dict>
+		<key>save_to_desktop</key>
+		<string>false</string>
+	</dict>
 	<key>version</key>
-	<string>1.1.2</string>
+	<string>20.2</string>
 	<key>webaddress</key>
 	<string>http://vitorgalvao.com/</string>
 </dict>

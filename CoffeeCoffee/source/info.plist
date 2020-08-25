@@ -98,6 +98,8 @@
 				<false/>
 				<key>alfredfiltersresultsmatchmode</key>
 				<integer>0</integer>
+				<key>argumenttreatemptyqueryasnil</key>
+				<false/>
 				<key>argumenttrimmode</key>
 				<integer>0</integer>
 				<key>argumenttype</key>
@@ -179,7 +181,7 @@ puts({ items: script_filter_items }.to_json)</string>
 			<key>uid</key>
 			<string>94757117-A2E1-4FE7-A171-555588BE76FF</string>
 			<key>version</key>
-			<integer>2</integer>
+			<integer>3</integer>
 		</dict>
 		<dict>
 			<key>config</key>
@@ -222,6 +224,8 @@ fi</string>
 			<dict>
 				<key>argument</key>
 				<string>{query}</string>
+				<key>passthroughargument</key>
+				<false/>
 				<key>variables</key>
 				<dict>
 					<key>prevent_display_sleep</key>
@@ -268,13 +272,13 @@ function url_exists {
 }
 
 function notification {
-  readonly local notificator="$(find . -type d -name 'Notificator.app')"
+  local -r notificator="$(find . -type d -name 'Notificator.app')"
   if [[ -n "${notificator}" ]]; then
     "${notificator}/Contents/Resources/Scripts/notificator" --message "${1}" --title "${alfred_workflow_name}" --subtitle 'A new version is available'
     return
   fi
 
-  readonly local terminal_notifier="$(find . -type f -name 'terminal-notifier')"
+  local -r terminal_notifier="$(find . -type f -name 'terminal-notifier')"
   if [[ -n "${terminal_notifier}" ]]; then
     "${terminal_notifier}" -title "${alfred_workflow_name}" -subtitle 'A new version is available' -message "${1}"
     return
@@ -339,6 +343,8 @@ fi</string>
 			<dict>
 				<key>argument</key>
 				<string>{query}</string>
+				<key>passthroughargument</key>
+				<false/>
 				<key>variables</key>
 				<dict>
 					<key>prevent_display_sleep</key>
@@ -354,16 +360,16 @@ fi</string>
 		</dict>
 	</array>
 	<key>readme</key>
-	<string>Prevent your computer from going to sleep. Uses [`caffeinate`](https://developer.apple.com/library/mac/documentation/Darwin/Reference/ManPages/man8/caffeinate.8.html) under the hood, so no third-party apps are required.
+	<string>Prevent your computer from going to sleep.
 
-Type `coffee` to turn it on. Action it with ⌥ to also prevent display from going to sleep.
-![](https://i.imgur.com/eVauELH.png)
+Type `coffee` to turn it on. Action with ⌥ to also prevent the display from going to sleep.
+![](https://i.imgur.com/GSUCRr4.png)
 
-If you give it a value it’ll be active only for that amount of time. It defaults to minutes, but will also understand seconds and hours.
-![](https://i.imgur.com/ONW8o5M.png)
+If you give a value it’ll be active for that amount of time. It defaults to minutes, but will also understand seconds and hours.
+![](https://i.imgur.com/lrTcwSa.png)
 
 Run `coffee` again to manually turn it off.
-![](https://i.imgur.com/60LCrQN.png)</string>
+![](https://i.imgur.com/d9NqISv.png)</string>
 	<key>uidata</key>
 	<dict>
 		<key>0B01601F-72A7-4C92-8B67-197D677D2A12</key>
@@ -418,7 +424,7 @@ Run `coffee` again to manually turn it off.
 		</dict>
 	</dict>
 	<key>version</key>
-	<string>1.2.1</string>
+	<string>20.2</string>
 	<key>webaddress</key>
 	<string>http://vitorgalvao.com/</string>
 </dict>

@@ -4,9 +4,9 @@ require 'json'
 require 'open3'
 require 'yaml'
 
-ENV['PATH'] = Open3.capture2('./_sharedresources', 'mediainfo', 'trash', 'youtubedl').first
+ENV['PATH'] = Open3.capture2('./_sharedresources', 'mediainfo', 'youtubedl').first
 
-Lists_dir = ENV['lists_dir'].nil? || ENV['lists_dir'].empty? ? ENV['alfred_workflow_data'] : "#{ENV['HOME']}/#{ENV['lists_dir']}"
+Lists_dir = ENV['lists_dir'].nil? || ENV['lists_dir'].empty? ? ENV['alfred_workflow_data'] : File.expand_path(ENV['lists_dir'])
 Towatch_list = "#{Lists_dir}/towatch.yaml".freeze
 Watched_list = "#{Lists_dir}/watched.yaml".freeze
 
@@ -26,14 +26,14 @@ def move_to_dir(path, target_dir)
 end
 
 def add_local_to_watchlist(path)
-  ensure_data_files
+  ensure_data_paths
 
   if File.file?(path)
     add_file_to_watchlist(path)
   elsif File.directory?(path)
     add_dir_to_watchlist(path)
   else
-    error('Not a valid path.')
+    error('Not a valid path')
   end
 end
 
@@ -73,8 +73,6 @@ def add_file_to_watchlist(file_path)
 end
 
 def add_dir_to_watchlist(dir_path)
-  error('Directory has no audiovisual content.') if find_audiovisual_files(dir_path).first.nil?
-
   id = random_hex
   name = File.basename(dir_path)
 
@@ -105,7 +103,7 @@ def update_series(id)
   list_hash = YAML.load_file(Towatch_list)
 
   dir_path = list_hash[id]['path']
-  audiovisual_files = find_audiovisual_files(dir_path)
+  audiovisual_files = list_audiovisual_files(dir_path)
   first_file = audiovisual_files.first
   count = audiovisual_files.count
 
@@ -131,7 +129,7 @@ def add_url_to_watchlist(url, playlist = false)
   playlist_flag = playlist ? '--yes-playlist' : '--no-playlist'
 
   all_names = Open3.capture2('youtube-dl', '--get-title', playlist_flag, url).first.split("\n")
-  error "Could not add url as stream: #{url}." if all_names.empty?
+  error "Could not add url as stream: #{url}" if all_names.empty?
   # If playlist, get the playlist name instead of the the name of the first item
   name = all_names.count > 1 ? Open3.capture2('youtube-dl', '--yes-playlist', '--get-filename', '--output', '%(playlist)s', url).first.split("\n").first : all_names[0]
 
@@ -165,122 +163,103 @@ def add_url_to_watchlist(url, playlist = false)
 end
 
 def display_towatch(sort = nil)
-  ensure_data_files
+  ensure_data_paths
 
-  script_filter_items = []
   list_hash = YAML.load_file(Towatch_list)
 
   if list_hash == false || list_hash.nil?
-    script_filter_items.push(title: 'Play (wlp)', subtitle: 'Nothing to watch. Go add something.', valid: false)
-  else
-    hash_to_output =
-      case sort
-      when 'duration_ascending'
-        list_hash.sort_by { |_id, content| content['duration']['machine'] }
-      when 'duration_descending'
-        list_hash.sort_by { |_id, content| content['duration']['machine'] }.reverse
-      when 'size_ascending'
-        list_hash.sort_by { |_id, content| content['size']['machine'] || Float::INFINITY }
-      when 'size_descending'
-        list_hash.sort_by { |_id, content| content['size']['machine'] || -Float::INFINITY }.reverse
-      when 'best_ratio'
-        list_hash.sort_by { |_id, content| content['ratio'] || -Float::INFINITY }.reverse
-      else
-        list_hash
-      end
+    puts({ items: [{ title: 'Play (wlp)', subtitle: 'Nothing to watch', valid: false }] }.to_json)
+    exit 0
+  end
 
-    hash_to_output.each do |id, details|
-      item_count = details['count'].nil? ? '' : "(#{details['count']}) 𐄁 "
+  script_filter_items = []
 
-      subtitle_info =
-        if details['type'] == 'stream'
-          "≈ #{item_count}#{details['duration']['human']} 𐄁 #{details['url']}"
-        else
-          "#{item_count}#{details['duration']['human']} 𐄁 #{details['size']['human']} 𐄁 #{details['path']}"
-        end
-
-      if details['type'] == 'series'
-        script_filter_items.push(
-          title: details['name'],
-          subtitle: subtitle_info,
-          arg: id,
-          mods: { alt: { subtitle: 'Rescan series' } }
-        )
-      else
-        script_filter_items.push(
-          title: details['name'],
-          subtitle: subtitle_info,
-          arg: id,
-          mods: { alt: { subtitle: 'Rescan is only available for series', valid: false } }
-        )
-      end
+  hash_to_output =
+    case sort
+    when 'duration_ascending'
+      list_hash.sort_by { |_id, content| content['duration']['machine'] }
+    when 'duration_descending'
+      list_hash.sort_by { |_id, content| content['duration']['machine'] }.reverse
+    when 'size_ascending'
+      list_hash.sort_by { |_id, content| content['size']['machine'] || Float::INFINITY }
+    when 'size_descending'
+      list_hash.sort_by { |_id, content| content['size']['machine'] || -Float::INFINITY }.reverse
+    when 'best_ratio'
+      list_hash.sort_by { |_id, content| content['ratio'] || -Float::INFINITY }.reverse
+    else
+      list_hash
     end
+
+  hash_to_output.each do |id, details|
+    item_count = details['count'].nil? ? '' : "(#{details['count']}) 𐄁 "
+
+    # Common values
+    item = {
+      title: details['name'],
+      arg: id,
+      mods: {}
+    }
+
+    # Common modifications
+    case details['type']
+    when 'file', 'series' # Not a stream
+      item[:subtitle] = "#{item_count}#{details['duration']['human']} 𐄁 #{details['size']['human']} 𐄁 #{details['path']}"
+    when 'file', 'stream' # Not a series
+      item[:mods][:alt] = { subtitle: 'Rescan is only available for series', valid: false }
+    end
+
+    # Specific modifications
+    case details['type']
+    when 'file'
+      item[:quicklookurl] = details['path']
+    when 'stream'
+      item[:subtitle] = "≈ #{item_count}#{details['duration']['human']} 𐄁 #{details['url']}"
+      item[:quicklookurl] = details['url']
+    when 'series'
+      item[:mods][:alt] = { subtitle: 'Rescan series' }
+    end
+
+    script_filter_items.push(item)
   end
 
   puts({ items: script_filter_items }.to_json)
 end
 
 def display_watched
-  ensure_data_files
+  ensure_data_paths
 
-  script_filter_items = []
   list_hash = YAML.load_file(Watched_list)
 
   if list_hash == false || list_hash.nil?
-    script_filter_items.push(title: 'Mark unwatched (wlu)', subtitle: 'You have no unwatched files.', valid: false)
-  else
-    list_hash.each do |id, details|
-      if details['type'] == 'stream'
-        script_filter_items.push(
-          title: details['name'],
-          subtitle: details['url'],
-          arg: id,
-          mods: {
-            cmd: {
-              subtitle: 'Open link in default browser',
-              arg: details['url']
-            },
-            alt: {
-              subtitle: 'Copy link to clipboard',
-              arg: details['url']
-            }
-          }
-        )
-      elsif details['url'].nil?
-        script_filter_items.push(
-          title: details['name'],
-          subtitle: details['path'],
-          arg: id,
-          mods: {
-            cmd: {
-              subtitle: 'This item has no origin url.',
-              valid: false
-            },
-            alt: {
-              subtitle: 'This item has no origin url.',
-              valid: false
-            }
-          }
-        )
-      else
-        script_filter_items.push(
-          title: details['name'],
-          subtitle: "#{details['url']} 𐄁 #{details['path']}",
-          arg: id,
-          mods: {
-            cmd: {
-              subtitle: 'Open link in default browser',
-              arg: details['url']
-            },
-            alt: {
-              subtitle: 'Copy link to clipboard',
-              arg: details['url']
-            }
-          }
-        )
-      end
-    end
+    puts({ items: [{ title: 'Mark unwatched (wlu)', subtitle: 'You have no unwatched files', valid: false }] }.to_json)
+    exit 0
   end
+
+  script_filter_items = []
+
+  list_hash.each do |id, details|
+    # Common values
+    item = {
+      title: details['name'],
+      arg: id,
+      mods: {}
+    }
+
+    # Modifications
+    if details['url'].nil?
+      item[:subtitle] = details['path']
+      item[:mods][:cmd] = { subtitle: 'This item has no origin url', valid: false }
+      item[:mods][:alt] = { subtitle: 'This item has no origin url', valid: false }
+    else
+      item[:subtitle] = details['type'] == 'stream' ? details['url'] : "#{details['url']} 𐄁 #{details['path']}"
+      item[:quicklookurl] = details['url']
+      item[:mods][:cmd] = { subtitle: 'Open link in default browser', arg: details['url'] }
+      item[:mods][:alt] = { subtitle: 'Copy link to clipboard', arg: details['url'] }
+    end
+
+    script_filter_items.push(item)
+  end
+
   puts({ items: script_filter_items }.to_json)
 end
 
@@ -291,20 +270,19 @@ def play(id, send_to_watched = true)
   case item['type']
   when 'file'
     return unless play_item('file', item['path'])
-    return if send_to_watched == false
-    trash(item['path'])
-    mark_watched(id)
+
+    mark_watched(id) if send_to_watched == true
   when 'stream'
     return unless play_item('stream', item['url'])
-    system('/usr/bin/afplay', '/System/Library/Sounds/Purr.aiff')
+
     mark_watched(id) if send_to_watched == true
   when 'series'
     if !File.exist?(item['path']) && send_to_watched == true
       mark_watched(id)
-      abort 'Marking as watched since the directory no longer exists.'
+      abort 'Marking as watched since the directory no longer exists'
     end
 
-    audiovisual_files = find_audiovisual_files(item['path'])
+    audiovisual_files = list_audiovisual_files(item['path'])
     first_file = audiovisual_files.first
 
     return unless play_item('file', first_file)
@@ -312,7 +290,6 @@ def play(id, send_to_watched = true)
 
     # If there are no more audiovisual files in the directory in addition to the one we just watched, trash the whole directory, else trash just the watched file
     if audiovisual_files.reject { |e| e == first_file }.empty?
-      trash(item['path'])
       mark_watched(id) if send_to_watched == true
     else
       trash(first_file)
@@ -321,15 +298,44 @@ def play(id, send_to_watched = true)
   end
 end
 
+# By checking for and running the CLI of certain players instead of the app bundle, we get access to the exit status. That way, in the 'play' method, even if the file were to be marked as watched we do not do it unless it was a success.
+# This means we can configure our video player to not exit successfully on certain conditions and have greater granularity with WatchList.
+def play_item(type, path)
+  return true if type != 'stream' && !File.exist?(path) # If non-stream item does not exist, exit successfully so it can still be marked as watched
+
+  # The 'split' together with 'last' serves to try to pick the last installed version, in case more than one is found (multiple versions in Homebrew Cellar, for example)
+  video_player = lambda {
+    mpv = Open3.capture2('mdfind', 'kMDItemCFBundleIdentifier', '=', 'io.mpv').first.strip.split("\n").last
+    return [mpv + '/Contents/MacOS/mpv', '--quiet'] if mpv
+
+    iina = Open3.capture2('mdfind', 'kMDItemCFBundleIdentifier', '=', 'com.colliderli.iina').first.strip.split("\n").last
+    return iina + '/Contents/MacOS/IINA' if iina
+
+    vlc = Open3.capture2('mdfind', 'kMDItemCFBundleIdentifier', '=', 'org.videolan.vlc').first.strip.split("\n").last
+    return vlc + '/Contents/MacOS/VLC' if vlc
+
+    return 'other'
+  }.call
+
+  error('To play a stream you need mpv, iina, or vlc') if video_player == 'other' && type == 'stream'
+
+  video_player == 'other' ? system('open', '-W', path) : Open3.capture2(*video_player, path)[1].success?
+end
+
 def mark_watched(id)
   maximum_watched = ENV['maximum_watched'].is_a?(Integer) ? ENV['maximum_watched'] : 9
+  item = YAML.load_file(Towatch_list)[id]
 
   switch_list(id, Towatch_list, Watched_list)
-
   list_hash = YAML.load_file(Watched_list)
-  return unless list_hash.count > maximum_watched
-
   File.write(Watched_list, list_hash.first(maximum_watched).to_h.to_yaml)
+
+  if item['type'] == 'stream'
+    system('/usr/bin/afplay', '/System/Library/Sounds/Purr.aiff')
+    return
+  end
+
+  trash item['path']
 end
 
 def mark_unwatched(id)
@@ -365,30 +371,6 @@ def edit_towatch
   File.write(Towatch_list, target_hash.to_yaml)
 end
 
-# By checking for and running the CLI of certain players instead of the app bundle, we get access to the exit status. That way, in the 'play' method, even if the file were to be marked as watched we do not do it unless it was a success.
-# This means we can configure our video player to not exit successfully on certain conditions and have greater granularity with WatchList.
-def play_item(type, path)
-  return true if type != 'stream' && !File.exist?(path) # If non-stream item does not exist, exit successfully so it can still be marked as watched
-
-  # The 'split' together with 'last' serves to try to pick the last installed version, in case more than one is found (multiple versions in Homebrew Cellar, for example)
-  video_player = lambda {
-    mpv_cli = Open3.capture2('mdfind', 'kMDItemCFBundleIdentifier', '=', 'io.mpv').first.strip.split("\n").last + '/Contents/MacOS/mpv'
-    return [mpv_cli, '--quiet'] if File.executable?(mpv_cli)
-
-    iina_cli = Open3.capture2('mdfind', 'kMDItemCFBundleIdentifier', '=', 'com.colliderli.iina').first.strip.split("\n").last + '/Contents/MacOS/IINA'
-    return iina_cli if File.executable?(iina_cli)
-
-    vlc_cli = Open3.capture2('mdfind', 'kMDItemCFBundleIdentifier', '=', 'org.videolan.vlc').first.strip.split("\n").last + '/Contents/MacOS/VLC'
-    return vlc_cli if File.executable?(vlc_cli)
-
-    return 'other'
-  }.call
-
-  error('To play a stream you need mpv, iina, or vlc.') if video_player == 'other' && type == 'stream'
-
-  video_player == 'other' ? system('open', '-W', path) : Open3.capture2(*video_player, path)[1].success?
-end
-
 def random_hex
   '%06x' % (rand * 0xffffff)
 end
@@ -402,6 +384,8 @@ def duration_in_seconds(file_path)
 end
 
 def seconds_to_hms(total_seconds)
+  return '[Unable to Get Duration]' if total_seconds.zero? # Can happen with youtube-dl's generic extractor (e.g. when adding direct link to an MP4)
+
   seconds = total_seconds % 60
   minutes = (total_seconds / 60) % 60
   hours = total_seconds / (60 * 60)
@@ -415,9 +399,23 @@ def audiovisual_file?(path)
   Open3.capture2('mdls', '-name', 'kMDItemContentTypeTree', path).first.include?('public.audiovisual-content')
 end
 
-def find_audiovisual_files(dir_path)
+def list_audiovisual_files(dir_path)
   escaped_path = dir_path.gsub(/([\*\?\[\]{}\\])/, '\\\\\1')
-  Dir.glob("#{escaped_path}/**/*").select { |e| audiovisual_file?(e) }
+  Dir.glob("#{escaped_path}/**/*").map(&:downcase).sort.select { |e| audiovisual_file?(e) }
+end
+
+def require_audiovisual(path)
+  if File.file?(path)
+    return if audiovisual_file?(path)
+
+    error('Is not an audiovisual file')
+  elsif File.directory?(path)
+    return unless list_audiovisual_files(path).first.nil?
+
+    error('Directory has no audiovisual content')
+  else
+    error('Not a valid path')
+  end
 end
 
 def add_to_list(hash, list)
@@ -444,9 +442,12 @@ def delete_from_list(id, list)
 end
 
 def switch_list(id, origin_list, target_list)
-  ensure_data_files
+  ensure_data_paths
 
   id_hash = { id => YAML.load_file(origin_list)[id] }
+
+  abort 'Item no longer exists' if id_hash.values.first.nil? # Detect if an item no longer exists before trying to move. Fix for cases where the same item is chosen a second time before having finished playing.
+
   delete_from_list(id, origin_list)
   prepend_to_list(id_hash, target_list)
 end
@@ -455,22 +456,21 @@ def send_to_top(id)
   switch_list(id, Towatch_list, Towatch_list)
 end
 
-def ensure_data_files
+def ensure_data_paths
   require 'fileutils'
 
-  Dir.mkdir(ENV['alfred_workflow_data']) unless Dir.exist?(ENV['alfred_workflow_data'])
-  Dir.mkdir(ENV['alfred_workflow_cache']) unless Dir.exist?(ENV['alfred_workflow_cache'])
-
+  Dir.mkdir(Lists_dir) unless Dir.exist?(File.expand_path(Lists_dir))
   FileUtils.touch(Towatch_list) unless File.exist?(Towatch_list)
   FileUtils.touch(Watched_list) unless File.exist?(Watched_list)
 end
 
 def trash(path)
-  system('trash', '-F', path)
+  escaped_path = path.gsub("'"){ "\\'" } # Escape single quotes, since they are the delimiters for the path in the JXA command
+  system('osascript', '-l', 'JavaScript', '-e', "Application('Finder').delete(Path('#{escaped_path}'))")
 end
 
 def notification(message, sound = '')
-  system("#{__dir__}/Notificator.app/Contents/Resources/Scripts/notificator", '--message', message, '--title', ENV['alfred_workflow_name'], '--sound', sound)
+  system("#{Dir.pwd}/Notificator.app/Contents/Resources/Scripts/notificator", '--message', message, '--title', ENV['alfred_workflow_name'], '--sound', sound)
 end
 
 def error(message)

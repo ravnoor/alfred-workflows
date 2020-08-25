@@ -24,7 +24,7 @@
 				<key>modifiers</key>
 				<integer>1048576</integer>
 				<key>modifiersubtext</key>
-				<string>Download video to watch later.</string>
+				<string>Download video to watch later</string>
 				<key>vitoclose</key>
 				<true/>
 			</dict>
@@ -34,7 +34,7 @@
 				<key>modifiers</key>
 				<integer>262144</integer>
 				<key>modifiersubtext</key>
-				<string>Copy video link to clipboard.</string>
+				<string>Copy video link to clipboard</string>
 				<key>vitoclose</key>
 				<false/>
 			</dict>
@@ -95,12 +95,14 @@
 				<true/>
 				<key>alfredfiltersresultsmatchmode</key>
 				<integer>0</integer>
+				<key>argumenttreatemptyqueryasnil</key>
+				<false/>
 				<key>argumenttrimmode</key>
 				<integer>0</integer>
 				<key>argumenttype</key>
 				<integer>1</integer>
 				<key>escaping</key>
-				<integer>102</integer>
+				<integer>0</integer>
 				<key>keyword</key>
 				<string>shorts</string>
 				<key>queuedelaycustom</key>
@@ -112,9 +114,9 @@
 				<key>queuemode</key>
 				<integer>1</integer>
 				<key>runningsubtext</key>
-				<string>Updating list; it may take a while…</string>
+				<string>Updating list may take a while…</string>
 				<key>script</key>
-				<string>ruby shortfilms.rb</string>
+				<string></string>
 				<key>scriptargtype</key>
 				<integer>1</integer>
 				<key>scriptfile</key>
@@ -133,7 +135,7 @@
 			<key>uid</key>
 			<string>325E0A83-2F46-4696-80F4-7D41608F65DC</string>
 			<key>version</key>
-			<integer>2</integer>
+			<integer>3</integer>
 		</dict>
 		<dict>
 			<key>config</key>
@@ -177,9 +179,9 @@ open -a "${video_player}" --args "${1}"</string>
 				<key>escaping</key>
 				<integer>102</integer>
 				<key>script</key>
-				<string>if ! osascript -e "tell application \"Alfred 3\" to run trigger \"new\" in workflow \"com.vitorgalvao.alfred.downvid\" with argument \"${1} video watchlist_true playlist_false\""; then
-  if osascript -e "display dialog \"The DownVid Workflow is required to download videos.\" with title \"DownVid is missing\" with icon POSIX file \"${PWD}/icon.png\" buttons { \"Cancel\", \"Download DownVid\" } default button \"Download DownVid\""; then
-    open 'https://raw.githubusercontent.com/vitorgalvao/alfred-workflows/master/DownVid/DownVid.alfredworkflow'
+				<string>if ! osascript -e "tell application id \"com.runningwithcrayons.Alfred\" to run trigger \"download_video\" in workflow \"com.vitorgalvao.alfred.downmedia\" with argument \"${1}\""; then
+  if osascript -e "display dialog \"The DownMedia Workflow is required to download videos.\" with title \"DownMedia is missing\" with icon POSIX file \"${PWD}/icon.png\" buttons { \"Cancel\", \"Download DownMedia\" } default button \"Download DownMedia\""; then
+    open 'https://raw.githubusercontent.com/vitorgalvao/alfred-workflows/master/DownMedia/DownMedia.alfredworkflow'
   fi
 fi</string>
 				<key>scriptargtype</key>
@@ -203,6 +205,8 @@ fi</string>
 				<false/>
 				<key>clipboardtext</key>
 				<string>{query}</string>
+				<key>ignoredynamicplaceholders</key>
+				<false/>
 				<key>transient</key>
 				<false/>
 			</dict>
@@ -211,7 +215,7 @@ fi</string>
 			<key>uid</key>
 			<string>2EF753EF-6194-4420-9096-C6892565EC96</string>
 			<key>version</key>
-			<integer>2</integer>
+			<integer>3</integer>
 		</dict>
 		<dict>
 			<key>config</key>
@@ -238,13 +242,13 @@ function url_exists {
 }
 
 function notification {
-  readonly local notificator="$(find . -type d -name 'Notificator.app')"
+  local -r notificator="$(find . -type d -name 'Notificator.app')"
   if [[ -n "${notificator}" ]]; then
     "${notificator}/Contents/Resources/Scripts/notificator" --message "${1}" --title "${alfred_workflow_name}" --subtitle 'A new version is available'
     return
   fi
 
-  readonly local terminal_notifier="$(find . -type f -name 'terminal-notifier')"
+  local -r terminal_notifier="$(find . -type f -name 'terminal-notifier')"
   if [[ -n "${terminal_notifier}" ]]; then
     "${terminal_notifier}" -title "${alfred_workflow_name}" -subtitle 'A new version is available' -message "${1}"
     return
@@ -347,6 +351,8 @@ fi</string>
 				<false/>
 				<key>alfredfiltersresultsmatchmode</key>
 				<integer>0</integer>
+				<key>argumenttreatemptyqueryasnil</key>
+				<false/>
 				<key>argumenttrimmode</key>
 				<integer>0</integer>
 				<key>argumenttype</key>
@@ -412,7 +418,7 @@ fi</string>
 			<key>uid</key>
 			<string>F52ABFBA-FC4F-400F-BF1B-AAF7B723052C</string>
 			<key>version</key>
-			<integer>2</integer>
+			<integer>3</integer>
 		</dict>
 		<dict>
 			<key>config</key>
@@ -436,12 +442,12 @@ function install_agent {
   # Change plist to use correct renew time according to current time zone
   readonly renew_hour="$(date -r $(TZ=EST date -jf "%H" 10 +%s) +"%H")"
   /usr/libexec/PlistBuddy -c "Set StartCalendarInterval:Hour ${renew_hour}" "${installed_plist_file}"
-  
-  launchctl load -w "${installed_plist_file}"
+
+  launchctl bootstrap "gui/$(id -u "${USER}")" "${installed_plist_file}"
 }
 
 function uninstall_agent {
-  launchctl unload -w "${installed_plist_file}"
+  launchctl bootout "gui/$(id -u "${USER}")" "${installed_plist_file}"
   rm "${installed_plist_file}"
 }
 
@@ -471,13 +477,13 @@ fi</string>
 	<key>readme</key>
 	<string>Stream from a selection of short films, powered by [Short of the Week](https://www.shortoftheweek.com/).
 
-Run `shorts` and it’ll show a list of the latest films. Pick one and it’ll start streaming. Alternatively, use ⌘ to download the video (requires [DownVid](https://github.com/vitorgalvao/alfred-workflows/tree/master/DownVid) and will automatically add to [WatchList](https://github.com/vitorgalvao/alfred-workflows/tree/master/WatchList) if available), ⌥ to see its synopsis, or ⌃ to copy the short’s link to the clipboard.
+Run `shorts` and it’ll show a list of the latest films. Pick one and it’ll start streaming. Alternatively, use ⌘ to download the video (requires [DownVid](https://github.com/vitorgalvao/alfred-workflows/tree/master/DownVid); adds to [WatchList](https://github.com/vitorgalvao/alfred-workflows/tree/master/WatchList) if available), ⌥ to see its synopsis, or ⌃ to copy the short’s link to the clipboard.
 
-![](https://i.imgur.com/XkfGJ6z.gif)
+![](https://i.imgur.com/nhXigIF.png)
 
 Short of the Week publishes a new short every day and building the initial list takes a few seconds, so after the initial download the list is cached for one day. If you want the list ready at all times without having to wait, run `:shortfilmslaunchd` to install (or later remove, running the same command) a `launchd` service to seamlessly update the list every day close to the time Short of the Week updates their website.
 
-![](https://i.imgur.com/ZoNMo4T.png)
+![](https://i.imgur.com/pKrvlah.png)
 
 To play a stream you need [mpv](http://mpv.io/), [IINA](https://lhc70000.github.io/iina/), or [VLC](http://www.videolan.org/vlc/index.html).</string>
 	<key>uidata</key>
@@ -551,7 +557,7 @@ To play a stream you need [mpv](http://mpv.io/), [IINA](https://lhc70000.github.
 		</dict>
 	</dict>
 	<key>version</key>
-	<string>1.13.6</string>
+	<string>20.8</string>
 	<key>webaddress</key>
 	<string>http://vitorgalvao.com/</string>
 </dict>
